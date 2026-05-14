@@ -1,0 +1,36 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: hf-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: Olu-Victor
+          HF_SPACE: trading-floor
+        run: |
+          set -euo pipefail
+          if [[ -z "${HF_TOKEN}" ]]; then
+            echo "::error::HF_TOKEN secret is not configured on this repo."
+            exit 1
+          fi
+          git config user.email "ci@github.com"
+          git config user.name "github-actions[bot]"
+          git remote add hf "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE}"
+          git push hf HEAD:main --force
