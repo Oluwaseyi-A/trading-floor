@@ -19,7 +19,7 @@ from templates import (
 from mcp_params import trader_mcp_server_params, researcher_mcp_server_params
 from accounts import LOCAL_SESSION_ID
 
-load_dotenv(override=True)
+load_dotenv()
 
 DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
 GROK_BASE_URL = "https://api.x.ai/v1"

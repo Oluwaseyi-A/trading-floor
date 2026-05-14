@@ -1,8 +1,5 @@
 import sqlite3
 import json
-from dotenv import load_dotenv
-
-load_dotenv(override=True)
 
 DB = "accounts.db"
 
@@ -26,7 +23,7 @@ with sqlite3.connect(DB) as conn:
 
 
 def make_key(name: str, session_id: str) -> str:
-    return f"{session_id}:{name.lower()}"
+    return f"{session_id.lower()}:{name.lower()}"
 
 
 def write_account(key, account_dict):

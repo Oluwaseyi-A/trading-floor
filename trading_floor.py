@@ -18,7 +18,7 @@ from market import is_market_open
 from accounts import LOCAL_SESSION_ID
 from session import ensure_memory_dir
 
-load_dotenv(override=True)
+load_dotenv()
 
 RUN_EVERY_N_MINUTES = int(os.getenv("RUN_EVERY_N_MINUTES", "60"))
 RUN_EVEN_WHEN_MARKET_IS_CLOSED = (

@@ -5,7 +5,7 @@ from datetime import datetime
 from market import get_share_price
 from database import write_account, read_account, write_log, make_key
 
-load_dotenv(override=True)
+load_dotenv()
 
 DEFAULT_INITIAL_BALANCE = 20_000.0
 SPREAD = 0.002

@@ -50,7 +50,10 @@ these caps.
 
 ## Deployed at
 
-[https://huggingface.co/spaces/Olu-Victor/trading-floor](https://huggingface.co/spaces/Olu-Victor/trading-floor)
+- Hosted: [https://huggingface.co/spaces/Olu-Victor/trading-floor](https://huggingface.co/spaces/Olu-Victor/trading-floor)
+- Source: [https://github.com/Oluwaseyi-A/trading-floor](https://github.com/Oluwaseyi-A/trading-floor)
+
+GitHub `main` auto-deploys to the HF Space via `.github/workflows/deploy-hf.yml`.
 
 ## License
 

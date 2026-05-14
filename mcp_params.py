@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from market import is_paid_polygon, is_realtime_polygon
 
-load_dotenv(override=True)
+load_dotenv()
 
 brave_env = {"BRAVE_API_KEY": os.getenv("BRAVE_API_KEY", "")}
 polygon_api_key = os.getenv("POLYGON_API_KEY")

@@ -7,7 +7,7 @@ from database import write_market, read_market
 from functools import lru_cache
 from datetime import timezone
 
-load_dotenv(override=True)
+load_dotenv()
 
 polygon_api_key = os.getenv("POLYGON_API_KEY")
 polygon_plan = os.getenv("POLYGON_PLAN")
