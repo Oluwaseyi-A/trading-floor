@@ -1,11 +1,22 @@
-from traders import Trader
+"""Standalone scheduler for the 4 default traders.
+
+This entrypoint is for local dev/CLI (`uv run trading_floor.py`). The hosted
+Gradio app drives traders through its own per-session loop in `app.py` — this
+module only provides the roster + the simple "run forever every N minutes" loop.
+"""
+
 from typing import List
 import asyncio
-from tracers import LogTracer
-from agents import add_trace_processor
-from market import is_market_open
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from agents import add_trace_processor
+
+from traders import Trader
+from tracers import LogTracer
+from market import is_market_open
+from accounts import LOCAL_SESSION_ID
+from session import ensure_memory_dir
 
 load_dotenv(override=True)
 
@@ -31,16 +42,17 @@ else:
     short_model_names = ["GPT 4o mini"] * 4
 
 
-def create_traders() -> List[Trader]:
-    traders = []
-    for name, lastname, model_name in zip(names, lastnames, model_names):
-        traders.append(Trader(name, lastname, model_name))
-    return traders
+def create_traders(session_id: str = LOCAL_SESSION_ID) -> List[Trader]:
+    return [
+        Trader(name, lastname, model_name, session_id=session_id)
+        for name, lastname, model_name in zip(names, lastnames, model_names)
+    ]
 
 
 async def run_every_n_minutes():
+    ensure_memory_dir()
     add_trace_processor(LogTracer())
-    traders = create_traders()
+    traders = create_traders(LOCAL_SESSION_ID)
     while True:
         if RUN_EVEN_WHEN_MARKET_IS_CLOSED or is_market_open():
             await asyncio.gather(*[trader.run() for trader in traders])
@@ -50,5 +62,5 @@ async def run_every_n_minutes():
 
 
 if __name__ == "__main__":
-    print(f"Starting scheduler to run every {RUN_EVERY_N_MINUTES} minutes")
+    print(f"Starting scheduler (session=local) to run every {RUN_EVERY_N_MINUTES} minutes")
     asyncio.run(run_every_n_minutes())

@@ -1,7 +1,13 @@
+import os
 from mcp.server.fastmcp import FastMCP
-from accounts import Account
+from accounts import Account, LOCAL_SESSION_ID
+
+# The Gradio app spawns one accounts_server per visitor session and passes
+# SESSION_ID in the subprocess env. CLI usage falls back to "local".
+SESSION_ID = os.getenv("SESSION_ID", LOCAL_SESSION_ID)
 
 mcp = FastMCP("accounts_server")
+
 
 @mcp.tool()
 async def get_balance(name: str) -> float:
@@ -10,7 +16,8 @@ async def get_balance(name: str) -> float:
     Args:
         name: The name of the account holder
     """
-    return Account.get(name).balance
+    return Account.get(name, SESSION_ID).balance
+
 
 @mcp.tool()
 async def get_holdings(name: str) -> dict[str, int]:
@@ -19,7 +26,8 @@ async def get_holdings(name: str) -> dict[str, int]:
     Args:
         name: The name of the account holder
     """
-    return Account.get(name).holdings
+    return Account.get(name, SESSION_ID).holdings
+
 
 @mcp.tool()
 async def buy_shares(name: str, symbol: str, quantity: int, rationale: str) -> float:
@@ -31,7 +39,7 @@ async def buy_shares(name: str, symbol: str, quantity: int, rationale: str) -> f
         quantity: The quantity of shares to buy
         rationale: The rationale for the purchase and fit with the account's strategy
     """
-    return Account.get(name).buy_shares(symbol, quantity, rationale)
+    return Account.get(name, SESSION_ID).buy_shares(symbol, quantity, rationale)
 
 
 @mcp.tool()
@@ -44,7 +52,8 @@ async def sell_shares(name: str, symbol: str, quantity: int, rationale: str) -> 
         quantity: The quantity of shares to sell
         rationale: The rationale for the sale and fit with the account's strategy
     """
-    return Account.get(name).sell_shares(symbol, quantity, rationale)
+    return Account.get(name, SESSION_ID).sell_shares(symbol, quantity, rationale)
+
 
 @mcp.tool()
 async def change_strategy(name: str, strategy: str) -> str:
@@ -54,17 +63,20 @@ async def change_strategy(name: str, strategy: str) -> str:
         name: The name of the account holder
         strategy: The new strategy for the account
     """
-    return Account.get(name).change_strategy(strategy)
+    return Account.get(name, SESSION_ID).change_strategy(strategy)
+
 
 @mcp.resource("accounts://accounts_server/{name}")
 async def read_account_resource(name: str) -> str:
-    account = Account.get(name.lower())
+    account = Account.get(name.lower(), SESSION_ID)
     return account.report()
+
 
 @mcp.resource("accounts://strategy/{name}")
 async def read_strategy_resource(name: str) -> str:
-    account = Account.get(name.lower())
+    account = Account.get(name.lower(), SESSION_ID)
     return account.get_strategy()
+
 
 if __name__ == "__main__":
     mcp.run(transport='stdio')

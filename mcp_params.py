@@ -4,32 +4,42 @@ from market import is_paid_polygon, is_realtime_polygon
 
 load_dotenv(override=True)
 
-brave_env = {"BRAVE_API_KEY": os.getenv("BRAVE_API_KEY")}
+brave_env = {"BRAVE_API_KEY": os.getenv("BRAVE_API_KEY", "")}
 polygon_api_key = os.getenv("POLYGON_API_KEY")
 
-# The MCP server for the Trader to read Market Data
 
-if is_paid_polygon or is_realtime_polygon:
-    market_mcp = {
-        "command": "uvx",
-        "args": ["--from", "git+https://github.com/polygon-io/mcp_polygon@v0.1.0", "mcp_polygon"],
-        "env": {"POLYGON_API_KEY": polygon_api_key},
-    }
-else:
-    market_mcp = {"command": "uv", "args": ["run", "market_server.py"]}
+def _accounts_env(session_id: str) -> dict[str, str]:
+    """Env for subprocesses that should see the active session's session_id."""
+    env = {k: v for k, v in os.environ.items() if v is not None}
+    env["SESSION_ID"] = session_id
+    return env
 
 
-# The full set of MCP servers for the trader: Accounts and Market.
+def _market_mcp() -> dict:
+    if is_paid_polygon or is_realtime_polygon:
+        return {
+            "command": "uvx",
+            "args": ["--from", "git+https://github.com/polygon-io/mcp_polygon@v0.1.0", "mcp_polygon"],
+            "env": {"POLYGON_API_KEY": polygon_api_key or ""},
+        }
+    return {"command": "uv", "args": ["run", "market_server.py"]}
 
-trader_mcp_server_params = [
-    {"command": "uv", "args": ["run", "accounts_server.py"]},
-    market_mcp,
-]
 
-# The full set of MCP servers for the researcher: Fetch, Brave Search and Memory
+def trader_mcp_server_params(session_id: str) -> list[dict]:
+    """MCP servers exposed to a Trader agent: accounts + market data."""
+    return [
+        {
+            "command": "uv",
+            "args": ["run", "accounts_server.py"],
+            "env": _accounts_env(session_id),
+        },
+        _market_mcp(),
+    ]
 
 
-def researcher_mcp_server_params(name: str):
+def researcher_mcp_server_params(name: str, session_id: str) -> list[dict]:
+    """MCP servers exposed to the Researcher sub-agent: fetch, web search, per-session memory."""
+    memory_path = f"file:./memory/{session_id}_{name.lower()}.db"
     return [
         {"command": "uvx", "args": ["mcp-server-fetch"]},
         {
@@ -40,6 +50,6 @@ def researcher_mcp_server_params(name: str):
         {
             "command": "npx",
             "args": ["-y", "mcp-memory-libsql"],
-            "env": {"LIBSQL_URL": f"file:./memory/{name}.db"},
+            "env": {"LIBSQL_URL": memory_path},
         },
     ]
