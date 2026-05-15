@@ -44,6 +44,9 @@ from traders import Trader
 from util import css, js, Color
 
 
+COPYRIGHT_HTML = "<div class='tf-credit'>(c) 2026 Oluwaseyi Akinwande</div>"
+
+
 LOG_COLORS = {
     "trace": Color.WHITE,
     "agent": Color.CYAN,
@@ -331,6 +334,7 @@ def create_ui():
 
             launch_btn = gr.Button("Launch trading floor →", variant="primary", size="lg")
             setup_status = gr.Markdown("", visible=False)
+            gr.HTML(COPYRIGHT_HTML)
 
         # ---------------- Trading screen ----------------
         with gr.Group(visible=False) as trading_screen:
@@ -375,6 +379,8 @@ def create_ui():
                     panel_holdings.append(holdings)
                     panel_txns.append(transactions)
                     panel_names.append(gr.State(default_slot.name))
+
+            gr.HTML(COPYRIGHT_HTML)
 
             # Polling timers — keep dashboards fresh from the DB rows that
             # accounts_server is updating from inside trader.run().

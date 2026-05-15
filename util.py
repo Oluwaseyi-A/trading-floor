@@ -123,6 +123,14 @@ css = """
 .dataframe-fix-small .table-wrap { min-height: 150px; max-height: 150px; }
 .dataframe-fix .table-wrap { min-height: 200px; max-height: 200px; }
 
+.tf-credit {
+  color: var(--tf-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 24px 0 8px;
+  text-align: center;
+}
+
 footer { display: none !important; }
 """
 
