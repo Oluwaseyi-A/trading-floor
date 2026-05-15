@@ -1,7 +1,5 @@
 from enum import Enum
 
-# Sky/slate palette, generous whitespace, card shadows. Reference:
-# edwarddonner.com/outsmart — tight typography, one accent hue (sky), no footer.
 css = """
 :root {
   --tf-bg: #0f172a;
