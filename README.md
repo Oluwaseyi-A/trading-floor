@@ -58,3 +58,7 @@ GitHub `main` auto-deploys to the HF Space via `.github/workflows/deploy-hf.yml`
 ## License
 
 MIT
+
+## Contributors
+
+- [Oluwaseyi Akinwande](https://github.com/Oluwaseyi-A)
